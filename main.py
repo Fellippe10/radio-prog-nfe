@@ -361,8 +361,8 @@ def list_notas(data_filtro: Optional[str] = None, db: Session = Depends(get_db))
                 competencia=n.competencia,
                 pdf_url=n.pdf_url,
                 data_emissao=n.data_emissao,
-                cliente_nome=n.cliente.nome,
-                cliente_cnpj=n.cliente.cnpj
+                cliente_nome=n.cliente.nome if n.cliente else "Cliente Removido",
+                cliente_cnpj=n.cliente.cnpj if n.cliente else "N/A"
             )
         )
     return resultado
