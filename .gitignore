@@ -1,0 +1,17 @@
+# Ambiente Virtual Python
+venv/
+env/
+.env
+
+# Arquivos de cache e compilados
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+
+# Arquivo do banco de dados SQLite local (não subir para prod)
+clientes.db
+
+# Ignora pastas do n8n / temp files locais
+.DS_Store

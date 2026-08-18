@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emissão de Notas Fiscais - n8n</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="login-container">
+        <div class="login-background"></div>
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                </div>
+                <h2>Acesso Restrito</h2>
+                <p>Faça login para gerenciar o painel de notas fiscais</p>
+            </div>
+            <form id="loginForm" onsubmit="realizarLogin(event)">
+                <div class="form-group">
+                    <label for="username">Usuário</label>
+                    <div class="input-with-icon">
+                        <input type="text" id="username" required placeholder="admin">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Senha</label>
+                    <div class="input-with-icon">
+                        <input type="password" id="password" required placeholder="••••••••">
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary login-btn">Entrar no Sistema</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Painel Principal (Oculto inicialmente) -->
+    <div class="container" id="main-app" style="display: none;">
+        <header>
+            <h1>Gerenciador de Notas Fiscais</h1>
+        </header>
+
+        <main>
+            <section class="card form-section">
+                <h2>Cadastrar Novo Cliente</h2>
+                <form id="clienteForm">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="nome">Nome / Razão Social</label>
+                            <input type="text" id="nome" required placeholder="Empresa Cliente Ltda">
+                        </div>
+                        <div class="form-group">
+                            <label for="cnpj">CNPJ / CPF</label>
+                            <input type="text" id="cnpj" required placeholder="12345678000190">
+                        </div>
+                        <div class="form-group">
+                            <label for="email">E-mail</label>
+                            <input type="email" id="email" required placeholder="financeiro@cliente.com.br">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="cep">CEP</label>
+                            <input type="text" id="cep" required placeholder="01001000">
+                        </div>
+                        <div class="form-group">
+                            <label for="logradouro">Logradouro</label>
+                            <input type="text" id="logradouro" required placeholder="Rua das Flores">
+                        </div>
+                        <div class="form-group">
+                            <label for="numero">Número</label>
+                            <input type="text" id="numero" required placeholder="100">
+                        </div>
+                        <div class="form-group">
+                            <label for="complemento">Complemento</label>
+                            <input type="text" id="complemento" placeholder="Sala 204">
+                        </div>
+                        <div class="form-group">
+                            <label for="bairro">Bairro</label>
+                            <input type="text" id="bairro" required placeholder="Centro">
+                        </div>
+                        <div class="form-group">
+                            <label for="cidade">Cidade</label>
+                            <input type="text" id="cidade" required placeholder="São Paulo">
+                        </div>
+                        <div class="form-group">
+                            <label for="uf">UF</label>
+                            <input type="text" id="uf" required placeholder="SP" maxlength="2">
+                        </div>
+
+                        <div class="form-group full-width section-title">
+                            <h3>Dados do Serviço Padrão</h3>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="servico_codigo">Código do Serviço</label>
+                            <input type="text" id="servico_codigo" required value="121401">
+                        </div>
+                        <div class="form-group">
+                            <label for="servico_descricao">Descrição</label>
+                            <input type="text" id="servico_descricao" required value="Radio customizada">
+                        </div>
+                        <div class="form-group">
+                            <label for="servico_valor">Valor (R$)</label>
+                            <input type="number" id="servico_valor" required value="1.00" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="servico_aliquota">Alíquota ISS (%)</label>
+                            <input type="number" id="servico_aliquota" required value="6.0" step="0.01">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">Salvar Cliente</button>
+                    </div>
+                </form>
+            </section>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('clientes')">Gestão de Clientes</button>
+                <button class="tab-btn" onclick="switchTab('notas')">Histórico de Notas</button>
+            </div>
+
+            <!-- Seção de Clientes -->
+            <section id="clientes-section" class="card list-section">
+                <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <h2>Clientes Cadastrados</h2>
+                        <input type="text" id="filtroClientes" class="form-control" style="width: 250px; padding: 0.5rem; border-radius: 6px; border: 1px solid var(--border-color);" placeholder="Buscar por Nome ou CNPJ..." onkeyup="pesquisarClientes()">
+                    </div>
+                    <button class="btn-batch" onclick="emitirTodasNotas(this)">Emitir Todas as Notas</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="clientesTable">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CNPJ/CPF</th>
+                                <th>E-mail</th>
+                                <th>Serviço</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Seção de Notas -->
+            <section id="notas-section" class="card list-section" style="display: none;">
+                <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; gap: 1rem;">
+                    <h2>Notas Emitidas</h2>
+                    <div style="display: flex; gap: 1rem; align-items: center;">
+                        <input type="date" id="filtroDataNotas" class="form-control" style="width: auto;" onchange="loadNotas()">
+                        <button class="btn-primary" onclick="loadNotas()">🔄 Atualizar Histórico</button>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="notasTable">
+                        <thead>
+                            <tr>
+                                <th>Data Emissão</th>
+                                <th>Competência</th>
+                                <th>Cliente</th>
+                                <th>CNPJ</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Modal de Edição -->
+    <div id="editModal" class="modal-overlay">
+        <div class="modal-content card">
+            <div class="modal-header">
+                <h2>Editar Cliente</h2>
+                <button class="btn-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="editForm">
+                <input type="hidden" id="edit_id">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="edit_nome">Nome / Razão Social</label>
+                        <input type="text" id="edit_nome" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_cnpj">CNPJ / CPF</label>
+                        <input type="text" id="edit_cnpj" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_email">E-mail</label>
+                        <input type="email" id="edit_email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_cep">CEP</label>
+                        <input type="text" id="edit_cep" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_logradouro">Logradouro</label>
+                        <input type="text" id="edit_logradouro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_numero">Número</label>
+                        <input type="text" id="edit_numero" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_complemento">Complemento</label>
+                        <input type="text" id="edit_complemento">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_bairro">Bairro</label>
+                        <input type="text" id="edit_bairro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_cidade">Cidade</label>
+                        <input type="text" id="edit_cidade" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_uf">UF</label>
+                        <input type="text" id="edit_uf" required maxlength="2">
+                    </div>
+
+                    <div class="form-group full-width section-title">
+                        <h3>Dados do Serviço</h3>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_servico_codigo">Código do Serviço</label>
+                        <input type="text" id="edit_servico_codigo" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_servico_descricao">Descrição</label>
+                        <input type="text" id="edit_servico_descricao" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_servico_valor">Valor (R$)</label>
+                        <input type="number" id="edit_servico_valor" required step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="edit_servico_aliquota">Alíquota ISS (%)</label>
+                        <input type="number" id="edit_servico_aliquota" required step="0.01">
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancelar</button>
+                    <button type="submit" class="btn-primary">Salvar Alterações</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
