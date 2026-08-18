@@ -42,7 +42,7 @@ def verify_credentials(credentials: HTTPBasicCredentials = Depends(security)):
 # Removido dependência global para permitir o webhook público
 app = FastAPI(title="Emissão de Notas n8n")
 
-N8N_WEBHOOK_URL = "https://n8n.nextload.com.br/webhook-test/d03a3015-f158-4564-aff7-dddc77c6198c"
+N8N_WEBHOOK_URL = "https://n8n.nextload.com.br/webhook/d03a3015-f158-4564-aff7-dddc77c6198c"
 
 os.makedirs("static", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
