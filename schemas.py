@@ -34,7 +34,7 @@ class WebhookNotaPayload(BaseModel):
 
 class NotaEmitidaResponse(BaseModel):
     id: int
-    cliente_id: int
+    cliente_id: Optional[int]
     competencia: str
     pdf_url: str
     data_emissao: datetime
